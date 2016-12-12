@@ -713,7 +713,113 @@ Test('that the new footer updates with the shopping cart',function(){
         </div>
       </section>
       
+ <h3>
+        <a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true">
+          <span aria-hidden="true" class="octicon octicon-link"></span>
+        </a>
+Working With Variables</h3>
+
+      <section class="container">
+        <div class="row">
+          <div class="left">
+            In Jasmine and Orchid, it/It functions are chained together with promises, maintaining scope. <br/><br/> So a variable that is changed in a previous it/It function will be accessable in future it/It functions.
+          </div>
+          <pre>
+            <code class="javascript">
+
+var foo = "unchanged";
+
+Describe('change foo',function(){
+    It('should change foo',function(){
+        foo = "changed";
+    })();
+})();
+
+Describe('print foo',function(){
+    It('should print foo',function(){
+        console.log(foo);
+    })();
+})();
+
+// logs "changed"
+            </code>
+          </pre>
+        </div>
+      </section>
+            
+            
+  <section class="container">
+        <div class="row">
+          <div class="left">
+            However, when working with reusable tests in Orchid, you will notice that the scope inside the it/It functions are not recognized when passed to the outside Describe functions.<br/><br/> This is because the Describe functions look for that variable in their outside scope. In this case, "unchanged".
+          </div>
+          <pre>
+            <code class="javascript">
+
+var foo = "unchanged";
+
+Describe('change foo',function(){
+    It('should change foo',function(){
+        foo = "changed";
+    })();
+})();
+
+Describe('print what is passed in',function(str){
+    It('should print what is passed in',function(str){
+        console.log(str);
+    })(str);
+})(foo);
+
+// logs "unchanged"
+            </code>
+          </pre>
+        </div>
+      </section>
       
+       <section class="container">
+        <div class="row">
+          <div class="left">
+            The solution is to use Javascript object literals. <br/><br/>Pass in the name of the object's property that you want to reference or modify, and then call that object's property inside the It scope. <br/><br/>This maintains a global scope environment in your tests.
+          </div>
+          <pre>
+            <code class="javascript">
+
+var foo = {};
+foo['bar'] = "unchanged";
+
+Describe('change a foo property',function(){
+    It('should change a foo property',function(){
+        foo['bar'] = "changed";
+    })();
+})();
+
+Describe('print a foo property',function(prop){
+    It('should print a foo property',function(prop){
+        console.log(foo[prop]);
+    })(prop);
+})('bar');
+
+/* Notice that you do not pass in foo['bar']
+// because that would look for foo['bar] on the outside scope,
+// Instead you pass in 'bar' and then look up foo['bar'] inside 
+// the It function's scope.
+*/
+
+// logs "changed"
+
+Describe("print an object's property",function(obj,prop){
+    It("should print an object's property",function(obj,prop){
+        console.log(obj[prop]);
+    })(obj,prop);
+})(foo,'bar');
+
+// logs "changed"
+
+            </code>
+          </pre>
+        </div>
+      </section>
+            
       
       <h3 style="margin-top:100px;">
         <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true">
